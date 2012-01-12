@@ -4,9 +4,10 @@ intReg <- function(formula, start, boundaries,
                    ...,
                  contrasts = NULL, Hess = FALSE,
                  model = TRUE,
-                 method = c("logistic", "probit", "cloglog", "cauchit", "model.frame"),
+                 method = c("probit", "logistic", "cloglog", "cauchit", "model.frame"),
                      print.level=0,
-                   data, subset, weights, na.action)
+                   data, subset, weights, na.action,
+                   iterlim=100)
 {
    ## beta     parameters for the x-s (linear model)
    ## nBeta    number of x-s (including constant)
@@ -19,7 +20,9 @@ intReg <- function(formula, start, boundaries,
         eta <- offset
         if (nBeta > 0)
             eta <- eta + drop(x %*% beta)
-        Pr <- pfun((zeta[boundaryInterval + 1] - eta)/sd) - pfun((zeta[boundaryInterval] - eta)/sd)
+       Pr <- pfun((zeta[boundaryInterval + 1] - eta)/sd) - pfun((zeta[boundaryInterval] - eta)/sd)
+       if(any(Pr <= 0))
+           return(NA)
        names(Pr) <- NULL
                                         # individual probability to be in interval (zeta[y+1], zeta[y]])
        ll <- wt * log(Pr)
@@ -110,9 +113,7 @@ intReg <- function(formula, start, boundaries,
        upperBound <- y[,2]
        ## in case of interval regression, we have to construct a set of intervals and pack them correctly to the
        ## parameter vector
-       library(sets)
-                                        # we use sets here (sorry, need R >= 2.7)
-       intervals <- set()
+       intervals <- sets::set()
        for(i in 1:length(lowerBound)) {
           intervals <- intervals | c(lowerBound[i], upperBound[i])
        }
@@ -222,10 +223,12 @@ intReg <- function(formula, start, boundaries,
           yMean <- means[y]
           fit <- lm(yMean ~ x - 1)
           xCoefs <- coef(fit)
+          if(any(is.na(xCoefs))) {
+             cat("Suggested initial values:\n")
+             print(xCoefs)
+             stop("NA in the initial values")
+          }
           names(xCoefs) <- gsub("^x", "", names(xCoefs))
-          activePar[iBeta] <- TRUE
-          activePar[iBoundaries] <- FALSE
-          activePar[iStd] <- TRUE
           sigma <- sqrt(var(fit$residuals))
        }
        start[iBeta] <- xCoefs
@@ -236,22 +239,36 @@ intReg <- function(formula, start, boundaries,
        names(start)[iStd] <- "sigma"
     }
     else
-        if(length(start) != nBeta + nInterval)
-            stop("'start' is not of the correct length")
+        if(length(start) != iStd)
+            stop("'start' is of wrong length:\n",
+                 "The current model includes ", nBeta,
+                 " explanatory variables plus\n",
+                 length(iBeta), " interval boundaries ",
+                 "plus 1 disturbance standard deviation\n",
+                 "(", iStd, " in total).\n",
+                 "However, 'start' is of length ",
+                 length(start))
     if(print.level > 0) {
        cat("Initial values:\n")
        print(start)
     }
-    library(maxLik)
+    if(!ordered) {
+       ## Not ordered model: fix the fixed parameters
+       activePar <- logical(length(start))
+       activePar[iBeta] <- TRUE
+       activePar[iBoundaries] <- FALSE
+       activePar[iStd] <- TRUE
+    }
 ##     compareDerivatives(loglik, gradlik, t0=start)
 ##     stop()
     estimation <- maxLik(loglik, gradlik, start=start,
-                  method="BHHH", activePar=activePar, iterlim=500, ...)
+                  method="BHHH", activePar=activePar, iterlim=iterlim, ...)
     res <- c(estimation,
              param=list(list(ordered=ordered,
                       boundaries=boundaries,
                       index=list(beta=iBeta, boundary=iBoundaries, std=iStd),
-                      df=nObs - sum(activePar)
+                      df=nObs - sum(activePar),
+                      nObs=nObs
                       )),
              call=cl,
              terms=mt,
