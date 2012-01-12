@@ -1,4 +1,4 @@
-9eef0ea23c4ca6ce83f36add6be0e862 *DESCRIPTION
+2f25eda4c028332cdd47fdf8ef788e94 *DESCRIPTION
 8a9f3bdfdae6d5c254374f3fe659639a *NAMESPACE
 89bd83d62171817a1ca6835575f60c94 *NEWS
 b72f020fb3b6163c8b76732ae80ea78b *R/coef.intReg.R
@@ -10,13 +10,13 @@ a4124b58014964614bf0d0788fc8827b *R/nObs.intReg.R
 2eb87d5c0e82ff7f1d763fd76ae93333 *R/print.coef.intReg.R
 bf4a088ea3616b546d59f66fafeac87d *R/print.intReg.R
 e0ac6ba8f4143c67405a198068f1b977 *R/print.summary.intReg.R
-da63e61a749c07fc6536e8541fa1c7d0 *R/stdEr.intReg.R
-3a42289150e1ca44d7ad646a0f5c317d *R/summary.intReg.R
+6d2ce99756e982e13134ebd4a4502b07 *R/stdEr.intReg.R
+faa3c0e81d56773bd46bba23d2a1e7a7 *R/summary.intReg.R
 7c97e6f1f8cfc5d40e10fb027c7f894a *R/vcov.intReg.R
-0e61970dd4aac076a583be2272e837f5 *man/coef.intReg.Rd
-e2ecc87f302b2dbfe0756c456d2a6c9c *man/intReg.Rd
+8028cd5f101fc01262a7b2c360414c16 *man/coef.intReg.Rd
+593cc411cf6144ae4ec2796f8eb285c8 *man/intReg.Rd
 e3d6daea5f3256ad9061f3912ae81097 *man/model.frame.intReg.Rd
 9c5ce3800e52d631adf1dbaa8067e8a8 *man/model.matrix.intReg.Rd
 415c112f59209f84080b65064e2a6558 *man/nObs.intReg.Rd
-acc783b8d10bf2da7190c33ceb766881 *tests/intReg.R
-a5c470202b724b45a981be60ce72b1b2 *tests/intReg.Rout.save
+cad2def831bb3ab546b3ff9275ec160a *tests/intReg.R
+09ad8061c54d480aeb75966684639bd0 *tests/intReg.Rout.save
